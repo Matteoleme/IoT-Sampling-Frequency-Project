@@ -22,8 +22,8 @@ ArduinoFFT<float> FFT = ArduinoFFT<float>(vReal, vImag, samples, samplingFrequen
 
 
 // WiFi Setup
-const char* ssid = "FRITZ!Box 5530 IQ";
-const char* psw = "64392006393478462483";
+const char* ssid = "";
+const char* psw = "";
 
 //MQTT Setup
 const char* mqttServer = "5.tcp.eu.ngrok.io";

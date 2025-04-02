@@ -26,8 +26,8 @@ const char* ssid = "";
 const char* psw = "";
 
 //MQTT Setup
-const char* mqttServer = "5.tcp.eu.ngrok.io";
-int port = 19942;
+const char* mqttServer = "";
+int port = ;
 long lastMsg = 0;
 String stMac;
 char mac[50];
@@ -54,7 +54,6 @@ void setup()
   }
 
   client.setServer(mqttServer, port);
-  //client.setCallback(callback);
   
   Serial.println(" Connected!");
   delay(2500);
@@ -68,8 +67,6 @@ void mqttReconnect() {
     Serial.print("Attempting MQTT connection...");
     long r = random(1000);
     sprintf(clientId, "clientId-%ld", r);
-    // to connect to adafruit
-    // if (client.connect(clientId,SECRET_MQTT_USER, SECRET_MQTT_API_KEY)) {
     if (client.connect(clientId)) {
       Serial.print(clientId);
       Serial.println(" connected");

@@ -6,7 +6,7 @@ const uint16_t samples = 1024;
 const float signalFrequency = 10;
 const float signalFrequency2 = 300;
 const float signalFrequency3 = 1200;
-const uint16_t samplingFrequency = 5000;    // sostituisci con frequenza massima possibile
+const uint16_t samplingFrequency = 325000;    // Max Frequency
 const uint16_t amplitude = 50;
 
 float vReal[samples];
@@ -23,8 +23,7 @@ ArduinoFFT<float> FFT = ArduinoFFT<float>(vReal, vImag, samples, samplingFrequen
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial)
-    ;
+  while (!Serial);
   Serial.println("Ready");
 }
 
@@ -47,12 +46,11 @@ void loop() {
   FFT.complexToMagnitude(); /* Compute magnitudes */
   PrintVector(vReal, (samples >> 1), SCL_FREQUENCY);
 
-  float maxFreq = maxFrequenza(vReal);
-  Serial.print("Dovresti campionare a :");
+  float maxFreq = maxFrequency(vReal);
+  Serial.print("You have to sample at: ");
   Serial.print(maxFreq * 2, 6);
   Serial.println("Hz");
-  while (1)
-    ; /* Run Once */
+  while (1); /* Run Once */
 }
 
 void PrintVector(float *vData, uint16_t bufferSize, uint8_t scaleType) {
@@ -79,11 +77,11 @@ void PrintVector(float *vData, uint16_t bufferSize, uint8_t scaleType) {
   Serial.println();
 }
 
-float maxFrequenza(float *vReal) {
-  float soglia = average(vReal);
+float maxFrequency(float *vReal) {
+  float threshold = average(vReal);
   float maxIndex = 0;
   for (int i = 0; i < samples / 2; i++) {
-    if (vReal[i] > soglia) maxIndex = i;
+    if (vReal[i] > threshold) maxIndex = i;
   }
   return (maxIndex * samplingFrequency) / samples;
 }

@@ -1,5 +1,5 @@
-uint32_t campioni = 0;
-unsigned long ultimoMillis = 0;
+uint32_t samples = 0;
+unsigned long lastMillis = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -7,14 +7,14 @@ void setup() {
 
 void loop() {
   int val = analogRead(7);
-  campioni++;
+  samples++;
 
-  // Stampo ogni secondo
-  if (millis() - ultimoMillis >= 1000) {
-    Serial.print("Campionamento ADC: ");
-    Serial.print(campioni);
-    Serial.println(" campioni/s");
-    campioni = 0;
-    ultimoMillis = millis();
+  // Print each second
+  if (millis() - lastMillis >= 1000) {
+    Serial.print("ADC: ");
+    Serial.print(samples);
+    Serial.println(" samples/s");
+    millis = 0;
+    lastMillis = millis();
   }
 }

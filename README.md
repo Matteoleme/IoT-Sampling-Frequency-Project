@@ -46,3 +46,89 @@ The function for identifying the dominant frequency works as follows:
     
 
 This frequency is then used to re-run the program with the correct sampling rate for efficient data acquisition.
+
+## Computing Aggregate Function and Communicating to the Server
+
+After executing this program, the identified frequency was approximately **2475 Hz**. According to the sampling theorem, a signal can be correctly reconstructed if sampled at twice its highest frequency component. Since the highest frequency in the generated signal was **1200 Hz**, the calculated sampling frequency aligns correctly with the theory.
+
+Now, using the identified frequency (2500 Hz), the signal is sampled at a lower frequency to reduce energy consumption. After computing the Fourier Transform of the signal again, the average value of the `vReal` vector is calculated over a time window equal to `samples/samplingFrequency`. In this case, the window is approximately **0.4 seconds**. We could increase the time window by using more samples.
+
+This aggregated value is then transmitted via **MQTT** to a server. The ESP32 is connected to Wi-Fi and uses the [`PubSubClient`](https://docs.arduino.cc/libraries/pubsubclient/) library to connect to the MQTT server. The computed value is published to the topic **"matteo/FFT/avg"**.
+
+### Infrastructure Setup
+
+The following infrastructure is used for communication:
+
+1.  **Local MQTT Server**: Raspberry Pi running Mosquitto
+    
+2.  **Client Publisher**: ESP32
+    
+3.  **Client Subscriber**: Raspberry Pi or PC with Mosquitto client
+    
+
+### Subscribing to the Topic
+
+To subscribe to the topic, the following command can be used:
+
+    mosquitto_sub -h <server> -p <port> -t "matteo/FFT/avg"*
+
+## [Communicating the Aggregate Value to the Cloud](https://github.com/Matteoleme/IoT-Sampling-Frequency-Project/blob/main/programs/AvgToLoRa.ino)
+
+The same logic used for computing the FFT and calculating the average was applied in this step. However, instead of sending the data via Wi-Fi, the ESP32 transmits the aggregated value using **LoRa** to **The Things Network (TTN)**.
+
+### Infrastructure Setup
+
+1.  **ESP32 LoRa Connection**:
+    
+    -   The ESP32 was connected to **TTN**.
+        
+    -   After establishing the connection, the necessary credentials were obtained from TTN and integrated into the program.
+        
+    -   The [`EzLoRaWAN.h`](https://github.com/rgot-org/EzLoRaWan) library was used to send messages to the LoRaWAN infrastructure.
+        
+    -   The ESP32 was tested at **Sapienza University, San Pietro in Vincoli**, where it connected to a nearby LoRa gateway.
+        
+2.  **PC MQTT Client**:
+    
+    -   Using **TTN**, the MQTT server details were retrieved.
+        
+    -   The following command was used to subscribe to the topic and receive the transmitted data:
+        
+    
+    ```
+    mosquitto_sub -h eu1.cloud.thethings.network -p 1883 -t "#" -u "appName@ttn" -P "API_KEY" -d
+    ```
+
+### Respose example
+Part of the message I received 
+```
+"received_at": "2025-04-03T12:36:34.269817643Z",
+"uplink_message": {
+"session_key_id": "AZX7poOIR70Fhnx4VhmGhA==",
+"f_port": 1,
+"f_cnt": 4,
+"frm_payload": "AQI/Ag==",
+"decoded_payload": {
+"analog_in_1": 161.3
+},
+"rx_metadata": [
+{
+"gateway_ids": {
+"gateway_id": "spv-rooftop-panorama",
+"eui": "AC1F09FFFE057698"
+},
+"timestamp": 938868292,
+"rssi": -107,
+"channel_rssi": -107,
+"snr": 4.8,
+"location": {
+"latitude": 41.8937,
+"longitude": 12.49399,
+"altitude": 55,
+"source": "SOURCE_REGISTRY"
+},
+"uplink_token": "CiIKIAoUc3B2LXJvb2Z0b3AtcGFub3JhbWESCKwfCf/+BXaYEMT8178DGgsI0oG6vwYQpICOHiCg86THqb6bAQ==",
+"channel_index": 6,
+"received_at": "2025-04-03T12:36:34.040594204Z"
+}],
+```

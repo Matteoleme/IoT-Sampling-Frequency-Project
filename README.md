@@ -183,4 +183,32 @@ To configure the Raspberry Pi to automatically send an ACK upon receiving a mess
 
     mosquitto_sub -t "matteo/FVT/avg" | xargs -I{} mosquitto_pub -t "ack_channel" -m {}
 
-![](MQTTLatency.mp4)
+[![MQTT Latency video]([https://i.sstatic.net/Vp2cE.png](https://img.freepik.com/free-vector/modern-flat-style-clean-white-video-player-template_1017-25482.jpg))](https://drive.google.com/file/d/1Ixhvbo92gGXvTQKjJ2w-WtfCB5ZSCrPN/view?usp=sharing)
+
+### **Performance Analysis with Different Input Signals**
+
+To evaluate how different types of input signals impact the system's performance, we consider the following three cases:
+
+1.  **Low-frequency single sine wave:**
+    
+    -   This signal contains only one low-frequency component (e.g., 50Hz).
+        
+    -   The system can sample at a much lower frequency while still preserving the signal characteristics.
+        
+    -   **Result:** The adaptive sampling method further reduces power consumption compared to the previous test, as the sampling frequency is significantly lower.
+        
+2.  **Composite signal with higher frequency components:**
+    
+    -   This signal is a sum of sine waves, including a higher frequency component (e.g., 15kHz).
+        
+    -   To properly reconstruct the signal, the system must sample at a much higher rate, increasing energy consumption.
+        
+    -   **Result:** The adaptive sampling method still reduces energy compared to over-sampling, but the savings are less significant due to the higher required sampling rate.
+        
+3.  **Signal with frequencies exceeding ESP32’s maximum sampling capability:**
+    
+    -   This signal contains frequency components beyond half of the ESP32's maximum sampling frequency.
+        
+    -   Even if sampled at the highest possible rate, aliasing occurs, making correct reconstruction impossible.
+        
+    -   **Result:** The system consumes more power, but the captured data does not accurately represent the original signal. This demonstrates a fundamental limitation of the hardware in handling very high-frequency signals.

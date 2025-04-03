@@ -183,3 +183,4 @@ To configure the Raspberry Pi to automatically send an ACK upon receiving a mess
 
     mosquitto_sub -t "matteo/FVT/avg" | xargs -I{} mosquitto_pub -t "ack_channel" -m {}
 
+![](MQTTLatency.mp4)

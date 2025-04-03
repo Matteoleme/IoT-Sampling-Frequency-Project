@@ -91,5 +91,5 @@ float average(float *vReal) {
   for (int i = 0; i < samples / 2; i++) {
     average += vReal[i];
   }
-  return average / samples;
+  return average / (samples/2);
 }

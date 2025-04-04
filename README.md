@@ -207,18 +207,34 @@ To evaluate how different types of input signals impact the system's performance
         
     -   **Result:** The adaptive sampling method further reduces power consumption compared to the previous test, as the sampling frequency is significantly lower.
 
+	![LowFrequencySampling](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/LowFrequencySignalSampling.png)
+        
 2.  **Composite signal with higher frequency components:**
     
-    -   This signal is a sum of sine waves, including a higher frequency component (e.g., 15kHz).
+    -   This signal is a sum of sine waves, including a higher frequency component (15kHz).
         
-    -   To properly reconstruct the signal, the system must sample at a much higher rate, increasing energy consumption.
+    -   Parameters:
+	    - samples = 1024;
+	    - signalFrequency = 500;
+	    - signalFrequency2 = 8000;
+	    - signalFrequency3 = 15000;
+	    - samplingFrequency = 32000;
+	    - amplitude = 50;
         
     -   **Result:** The adaptive sampling method still reduces energy compared to over-sampling, but the savings are less significant due to the higher required sampling rate.
+![HighFrequencySampling](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/HighFrequencySignalSampling.png)
         
 3.  **Signal with frequencies exceeding ESP32’s maximum sampling capability:**
     
     -   This signal contains frequency components beyond half of the ESP32's maximum sampling frequency.
-        
-    -   Even if sampled at the highest possible rate, aliasing occurs, making correct reconstruction impossible.
+	-   Parameters:
+	    - samples = 2048;
+	    - signalFrequency = 5000;
+	    - signalFrequency2 = 10000;
+	    - signalFrequency3 = 35000;
+	    - samplingFrequency = 75000;
+	    - amplitude = 50;
         
     -   **Result:** The system consumes more power, but the captured data does not accurately represent the original signal. This demonstrates a fundamental limitation of the hardware in handling very high-frequency signals.
+
+![ImpossibleSampling](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/TooHighFrequencySignalSampling.png)

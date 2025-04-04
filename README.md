@@ -222,7 +222,8 @@ To evaluate how different types of input signals impact the system's performance
 	    - amplitude = 50;
         
     -   **Result:** The adaptive sampling method still reduces energy compared to over-sampling, but the savings are less significant due to the higher required sampling rate.
-![HighFrequencySampling](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/HighFrequencySignalSampling.png)
+	
+ 	![HighFrequencySampling](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/HighFrequencySignalSampling.png)
         
 3.  **Signal with frequencies exceeding ESP32’s maximum sampling capability:**
     
@@ -236,5 +237,5 @@ To evaluate how different types of input signals impact the system's performance
 	    - amplitude = 50;
         
     -   **Result:** The system consumes more power, but the captured data does not accurately represent the original signal. This demonstrates a fundamental limitation of the hardware in handling very high-frequency signals.
-
-![ImpossibleSampling](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/TooHighFrequencySignalSampling.png)
+	
+ 	![ImpossibleSampling](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/TooHighFrequencySignalSampling.png)

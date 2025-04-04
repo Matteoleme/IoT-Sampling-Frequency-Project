@@ -206,7 +206,7 @@ To evaluate how different types of input signals impact the system's performance
     -   The system can sample at a much lower frequency while still preserving the signal characteristics.
         
     -   **Result:** The adaptive sampling method further reduces power consumption compared to the previous test, as the sampling frequency is significantly lower.
-    -           
+
 2.  **Composite signal with higher frequency components:**
     
     -   This signal is a sum of sine waves, including a higher frequency component (e.g., 15kHz).

@@ -189,14 +189,24 @@ To configure the Raspberry Pi to automatically send an ACK upon receiving a mess
 
 To evaluate how different types of input signals impact the system's performance, we consider the following three cases:
 
-1.  **Low-frequency single sine wave:**
+### **Performance Analysis with Different Input Signals**
+
+To evaluate how different types of input signals impact the system's performance, we consider the following three cases:
+
+1.  **Low-frequency signal:**
     
-    -   This signal contains only one low-frequency component (e.g., 50Hz).
+    -   Parameters:
+	    - samples = 128;
+	    - signalFrequency = 1;
+	    - signalFrequency2 = 2;
+	    - signalFrequency3 = 6;
+	    - samplingFrequency = 15;
+	    - This means sampling time equals to 128/15 = 8,5s 
         
     -   The system can sample at a much lower frequency while still preserving the signal characteristics.
         
     -   **Result:** The adaptive sampling method further reduces power consumption compared to the previous test, as the sampling frequency is significantly lower.
-        
+    -           
 2.  **Composite signal with higher frequency components:**
     
     -   This signal is a sum of sine waves, including a higher frequency component (e.g., 15kHz).

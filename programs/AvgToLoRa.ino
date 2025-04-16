@@ -1,4 +1,3 @@
-#include <arduinoFFT.h>
 #include <EzLoRaWAN_CayenneLPP.h>
 #include <EzLoRaWAN.h>
 
@@ -15,16 +14,25 @@ EzLoRaWAN_CayenneLPP lpp;
 #endif
 
 // Configurazione FFT
-const uint16_t samples = 1024;
-const float signalFrequency = 10;
-const float signalFrequency2 = 300;
-const float signalFrequency3 = 1200;
-const uint16_t samplingFrequency = 2500;
-const uint16_t amplitude = 50;
-float vReal[samples];
-float vImag[samples];
+const float samplingFrequency = 50;
+float signalFrequency = 1;
+float signalFrequency2 = 7;
+float signalFrequency3 = 20;
+float amplitude = 10;
 
-ArduinoFFT<float> FFT = ArduinoFFT<float>(vReal, vImag, samples, samplingFrequency);
+const int sec = 10;     // window time size
+const int samplesWindowSize = samplingFrequency * sec;
+float windowBuffer[samplesWindowSize];
+int buffIndex = 0;
+int windowCount = 0;
+
+// Timers
+unsigned long lastSampleTime = 0;
+unsigned long samplingIntervalMs = 1000.0 / samplingFrequency;
+
+float lastSampleValue = 0;
+bool windowReady = false;
+
 
 void setup() {
   Serial.begin(9600);
@@ -45,46 +53,60 @@ void setup() {
   Serial.println("\njoined!");
 }
 
+
 void loop() {
-  // FFT and returns avg value
-  float avg = performFFT();
-  
-  // Send the computed value to LoRa
-  lpp.reset();
-  lpp.addAnalogInput(1, avg);
-  
-  if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize())) {
-    Serial.printf("FFT Average: %f\n", avg);
+    continuousSamplingFunction(); // campiona e aggiorna il buffer
+
+  if (windowReady) {
+    float maxVal = processWindowAndGetMax();
+    windowCount++;
+    windowReady = false;
+
+    // invia su TTN
+    lpp.reset();
+    lpp.addAnalogInput(1, maxVal);
+    if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize())) {
+      Serial.printf("Window #%d - Max: %f\n", windowCount, maxVal);
+    }
+
+    // dopo 5 finestre vai in deep sleep
+    if (windowCount % 10 == 5) {
+      Serial.println("Going to deep sleep for 15 seconds...");
+      esp_sleep_enable_timer_wakeup(15000000); // 15 secondi
+      esp_deep_sleep_start();
+    }
   }
-  
-  delay(10000);
 }
 
 
-float performFFT() {
-  float ratio = TWO_PI * signalFrequency / samplingFrequency;
-  float ratio2 = TWO_PI * signalFrequency2 / samplingFrequency;
-  float ratio3 = TWO_PI * signalFrequency3 / samplingFrequency;
-  
-  for (uint16_t i = 0; i < samples; i++) {
-    vReal[i] = float(amplitude * sin(i * ratio));
-    vReal[i] += float(amplitude * sin(i * ratio2));
-    vReal[i] += float(amplitude * sin(i * ratio3));
-    vImag[i] = 0.0;
+void continuousSamplingFunction() {
+  unsigned long now = millis();
+  if (now - lastSampleTime >= samplingIntervalMs) {
+    float time = windowCount * samplesWindowSize / samplingFrequency + buffIndex / samplingFrequency;
+    float value = amplitude * sin(TWO_PI * signalFrequency * time);
+    value += amplitude * sin(TWO_PI * signalFrequency2 * time);
+    value += amplitude * sin(TWO_PI * signalFrequency3 * time);
+
+    lastSampleValue = value;
+    lastSampleTime = now;
+    
+    // Passa alla funzione del buffer
+    bufferSample(value);
   }
-  
-  FFT.windowing(FFTWindow::Hamming, FFTDirection::Forward);
-  FFT.compute(FFTDirection::Forward);
-  FFT.complexToMagnitude();
-  
-  float average = 0;
-  for (int i = 0; i < samples / 2; i++) {
-    average += vReal[i];
+}
+
+void bufferSample(float value) {
+  windowBuffer[buffIndex++] = value;
+  if (buffIndex >= samplesWindowSize) {
+    buffIndex = 0;
+    windowReady = true;
   }
-  average /= (samples / 2);
-  
-  Serial.print("FFT average value: ");
-  Serial.println(average, 6);
-  
-  return average;
+}
+
+float processWindowAndGetMax() {
+  float maxVal = windowBuffer[0];
+  for (int i = 1; i < samplesWindowSize; i++) {
+    if (windowBuffer[i] > maxVal) maxVal = windowBuffer[i];
+  }
+  return maxVal;
 }

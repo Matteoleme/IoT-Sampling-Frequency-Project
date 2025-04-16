@@ -287,3 +287,25 @@ To configure the Raspberry Pi to automatically send an ACK upon receiving a mess
     mosquitto_sub -t "matteo/FVT/avg" | xargs -I{} mosquitto_pub -t "ack_channel" -m {}
 
 [![MQTT Latency video]([https://i.sstatic.net/Vp2cE.png](https://img.freepik.com/free-vector/modern-flat-style-clean-white-video-player-template_1017-25482.jpg))](https://drive.google.com/file/d/1Ixhvbo92gGXvTQKjJ2w-WtfCB5ZSCrPN/view?usp=sharing)
+
+### **Performance Analysis with Different Input Signals**
+To obtain a clean measurement of the impact of sampling frequency on energy consumption, I wrote a simplified version of the program. In this version, the ESP32 only samples the signal and enters light sleep between samples. No FFT or aggregated value is computed—just pure periodic sampling.
+
+I ran two tests using the same input signal:
+
+-   A high sampling frequency of **15,000 Hz**
+    
+-   A low sampling frequency of **12 Hz**
+    
+
+Using the same measurement setup as before (INA219 connected to a second ESP32 acting as a monitor), I observed a clear difference in power consumption:
+
+-   At **15,000 Hz**, the system consumed approximately **240 mW**
+![HighFreqResult](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/HighFreqSamplingResult.png)
+    
+-   At **12 Hz**, the power consumption dropped to around **16 mW**
+![LowFreqResult](https://raw.githubusercontent.com/Matteoleme/IoT-Sampling-Frequency-Project/refs/heads/main/media/LowFreqSamplingResult.png)    
+
+These results confirm that lowering the sampling frequency leads to significantly lower energy consumption, especially when combined with power-saving techniques like light sleep between samples.
+
+This energy saving becomes even more significant when the input signal changes slowly over time, allowing the microcontroller to remain in sleep mode for longer periods without missing important variations.

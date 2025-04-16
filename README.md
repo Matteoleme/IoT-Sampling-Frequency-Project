@@ -194,9 +194,8 @@ Part of the message I received
 }],
 ```
 
-## Measurements
 
-## Energy Consumption Strategy
+## Measure Energy Consumption 
 
 To measure energy consumption, I used the following setup:
 
@@ -210,7 +209,7 @@ To measure energy consumption, I used the following setup:
 
 At the beginning, I used `vTaskDelay()` to reduce CPU usage between samples. While this reduced power consumption slightly, it was not as effective as expected compared to using light or deep sleep modes.
 
-I then tested a more aggressive approach: entering light sleep between each sampling cycle, based on the computed sampling frequency. However, this led to two major issues:
+I then tested a different approach: entering light sleep between each sampling cycle, based on the computed sampling frequency. However, this led to two major issues:
 
 1.  **Unsuitable for the frequency range**: At those frequencies, the time and energy required to repeatedly enter and exit sleep mode made the approach inefficient.
     
